@@ -11,9 +11,9 @@ type handler struct {
 	service *login_service.Service
 }
 
-func New(service *login_service.Service) *handler {
+func New(loginService *login_service.Service) *handler {
 	return &handler{
-		service: service,
+		service: loginService,
 	}
 }
 

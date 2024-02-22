@@ -22,7 +22,6 @@ func (s *Service) Register(registerDto RegisterDto) (*entity.User, error) {
 		return nil, fmt.Errorf("hash password error %w", err)
 	}
 
-	// Находим пользователя по электронной почте
 	user, err := s.repo.Create(registerDto.Email, passwordHash)
 
 	if err != nil {

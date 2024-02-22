@@ -1,2 +1,4 @@
 .env*
 .idea/
+
+/internal/common/api.go
