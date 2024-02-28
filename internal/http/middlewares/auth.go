@@ -5,6 +5,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,6 +18,10 @@ type tokenData struct {
 }
 
 func AuthMiddleware(next http.Handler) http.Handler {
+	secretKey, exists := os.LookupEnv("AUTH_SECRET_KEY")
+	if !exists {
+		log.Fatal("AUTH_SECRET_KEY not founded")
+	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenHeader := r.Header.Get("Authorization") // получение данных из заголовка
 
@@ -28,7 +33,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		accessTokenString := accessTokenHeader[7:] // извлечение самой строки токена
 		token, err := jwt.ParseWithClaims(accessTokenString, &tokenData{}, func(token *jwt.Token) (interface{}, error) {
-			return common.SecretKey, nil
+			return secretKey, nil
 		})
 
 		ctx := r.Context()

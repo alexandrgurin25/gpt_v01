@@ -1,7 +1,6 @@
 package gigachat
 
 import (
-	"app/internal/common"
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"
@@ -80,22 +79,40 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 		return nil, err
 	}
 
+	RqUID, exists := os.LookupEnv("RqUID")
+
+	if !exists {
+		log.Fatal("RqUID NOT FOUNT IN .env")
+		return nil, nil
+	}
+
+	GigachatAuthorizationDate, exists := os.LookupEnv("GIGACHAT_AUTH_DATE")
+
+	if !exists {
+		log.Fatal("Authorization NOT FOUNT IN .env")
+		return nil, nil
+	}
+
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("RqUID", fmt.Sprint(common.RqUID)) //это рандом
-	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", common.GigachatAuthorizationDate))
+	req.Header.Add("RqUID", RqUID) //это рандом
+	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", GigachatAuthorizationDate))
 
 	c := makeHTTPSClient()
 	response, err := c.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("сould not get a response: %w", err)
 	}
 
 	defer response.Body.Close()
 
 	var result accessToken
 
-	json.NewDecoder(response.Body).Decode(&result)
+	err = json.NewDecoder(response.Body).Decode(&result)
+
+	if err != nil {
+		return nil, fmt.Errorf("NewDecoder cound not return decoder %w", err)
+	}
 
 	return &result, nil
 
@@ -104,7 +121,7 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 func makeHTTPSClient() *http.Client {
 	caCert, err := os.ReadFile("C:\\Users\\alex\\Desktop\\github\\russian_trusted_sub_ca.cer")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Check func makeHTTPSClient ->", err)
 	}
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
@@ -160,9 +177,9 @@ func (client *Client) Request(text string) ([]string, error) {
 
 	c := makeHTTPSClient()
 	response, err := c.Do(req)
-	fmt.Println("Запрос вопроса", response, err)
+
 	if err != nil {
-		println(err)
+		log.Println("%w", err)
 		return nil, err
 	}
 
@@ -173,9 +190,9 @@ func (client *Client) Request(text string) ([]string, error) {
 	err = json.NewDecoder(response.Body).Decode(&resAns)
 
 	if err != nil {
-		println(err)
-		return nil, err
+		return nil, fmt.Errorf("NewDecoder cound not return decoder %w", err)
 	}
+
 
 	answers := make([]string, 0, len(resAns.Choices))
 

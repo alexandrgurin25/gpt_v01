@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/golang-migrate/migrate/v4"
+	//"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5"
@@ -32,18 +32,18 @@ func New() (*DataBase, error) {
 		Conn: conn,
 	}
 
-	m, err := migrate.New(
-		"file://internal/database/migrations",
-		connURL,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("unable to migrate the database: %v\n", err)
-	}
+	// m, err := migrate.New(
+	// 	"file://internal/database/migrations",
+	// 	connURL,
+	// )
+	// if err != nil {
+	// 	return nil, fmt.Errorf("unable to migrate the database: %v\n", err)
+	// }
 
-	err = m.Up()
-	if err != nil {
-		log.Printf("Unable to migrate the database: %v\n", err)
-	}
+	// err = m.Up()
+	// if err != nil {
+	// 	log.Printf("Unable to migrate the database: %v\n", err)
+	// }
 
 	return &db, nil
 }

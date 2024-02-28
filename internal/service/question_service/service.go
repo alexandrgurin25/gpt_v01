@@ -1,8 +1,6 @@
 package question_service
 
 import (
-//	"app/internal/clients/gigachat"
-	"app/internal/clients/openai"
 	"app/internal/common"
 	"app/internal/entity"
 	"log"
@@ -11,18 +9,21 @@ import (
 	"app/internal/repository/question_repository"
 )
 
+type AnswerClient interface {
+	Request(text string) ([]string, error)
+}
+
 type Service struct {
-	repo   *question_repository.Repository
-//	chatGC *gigachat.Client
-	chatGPT *openai.Client
+	repo         *question_repository.Repository
+	answerClient AnswerClient
 }
 
 // func New(repo *question_repository.Repository, chatGC *gigachat.Client) *Service {
 // 	return &Service{repo: repo, chatGC: chatGC}
 // }
 
-func New(repo *question_repository.Repository, chatGPT *openai.Client) *Service {
-	return &Service{repo: repo, chatGPT: chatGPT}
+func New(repo *question_repository.Repository, answerClient AnswerClient) *Service {
+	return &Service{repo: repo, answerClient: answerClient}
 }
 
 func (s *Service) Create(userId string, text string) (*entity.Answer, error) {
@@ -35,8 +36,7 @@ func (s *Service) Create(userId string, text string) (*entity.Answer, error) {
 		return nil, err
 	}
 
-	//answer, err := s.chatGC.Request(text)
-	answer, err := s.chatGPT.Request(text)
+	answer, err := s.answerClient.Request(text)
 	if err != nil {
 		return nil, err
 	}
