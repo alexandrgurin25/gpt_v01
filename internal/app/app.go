@@ -11,7 +11,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 
-	// "app/internal/clients/gigachat"
 	"app/internal/clients/gigachat"
 	"app/internal/database"
 	"app/internal/http/handlers/create_question_handler"
@@ -48,10 +47,14 @@ func (a *app) Start() {
 		return
 	}
 
-	// Создаем тг-бота
 	userRepository := user_repository.New(dataBase)
 	questionRepository := question_repository.New(dataBase)
 	gigachat := gigachat.New()
+
+	/*
+	Пока не решена дальшейшая реализация 2 одновременно работающих 
+	нейронных сетей, поэтому пока используем наиболее простую (GigaChat)
+	*/
 	//gptchat := openai.New()
 
 	loginService := login_service.New(userRepository)
@@ -75,7 +78,7 @@ func (a *app) Start() {
 			log.Println("Failed to create Telegram bot:", err)
 			return
 		}
-
+		
 		//bot.Debug = true
 
 		updateConfig := tgbotapi.NewUpdate(0)
@@ -86,28 +89,7 @@ func (a *app) Start() {
 
 		for update := range updates {
 
-			if update.Message == nil {
-				continue
-			}
-
-			gigachatResponses, err := gigachat.Request(update.Message.Text)
-
-			if err != nil {
-				fmt.Println(err)
-				continue // Отобразить в чате
-			}
-
-			for _, response := range gigachatResponses {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, response)
-				msg.ReplyToMessageID = update.Message.MessageID
-
-				if _, err := bot.Send(msg); err != nil {
-					if _, err := bot.Send(msg); err != nil {
-						log.Println("Failed to send message via Telegram bot:", err)
-						continue
-					}
-				}
-			}
+			
 
 		}
 	}()

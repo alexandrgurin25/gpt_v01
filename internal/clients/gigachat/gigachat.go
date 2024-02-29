@@ -15,10 +15,24 @@ import (
 )
 
 type Client struct {
+	GigachatAuthorizationDate string
+	RqUID string
 }
 
 func New() *Client {
-	return &Client{}
+	GigachatAuthorizationDate, exists := os.LookupEnv("GIGACHAT_AUTH_DATE")
+
+	if !exists {
+		log.Panic("Gigachat_Auth_Date NOT FOUNT IN .env")	
+	}
+
+	RqUID, exists := os.LookupEnv("RqUID")
+
+	if !exists {
+		log.Panic("RqUID NOT FOUNT IN .env")
+	}
+
+	return &Client{GigachatAuthorizationDate: GigachatAuthorizationDate, RqUID: RqUID}
 }
 
 type accessToken struct {
@@ -79,24 +93,11 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 		return nil, err
 	}
 
-	RqUID, exists := os.LookupEnv("RqUID")
-
-	if !exists {
-		log.Fatal("RqUID NOT FOUNT IN .env")
-		return nil, nil
-	}
-
-	GigachatAuthorizationDate, exists := os.LookupEnv("GIGACHAT_AUTH_DATE")
-
-	if !exists {
-		log.Fatal("Authorization NOT FOUNT IN .env")
-		return nil, nil
-	}
-
+	
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("RqUID", RqUID) //это рандом
-	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", GigachatAuthorizationDate))
+	req.Header.Add("RqUID", client.RqUID) //это рандом
+	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", client.GigachatAuthorizationDate))
 
 	c := makeHTTPSClient()
 	response, err := c.Do(req)
