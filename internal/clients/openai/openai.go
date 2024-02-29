@@ -17,7 +17,7 @@ func New() *Client {
 	openApiKey, exists := os.LookupEnv("OPENAI_API_KEY")
 
 	if !exists {
-		log.Panic("OPENAI_API_KEY NOT FOUNT IN .env")	
+		log.Panic("OPENAI_API_KEY NOT FOUNT IN .env")
 	}
 
 	return &Client{openApiKey: openApiKey}
@@ -85,14 +85,13 @@ func (client *Client) Request(text string) ([]string, error) {
 		return nil, fmt.Errorf("NewRequest could not send request: %w", err)
 	}
 
-	
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", client.openApiKey))
 
 	c := &http.Client{}
 	response, err := c.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("сould not get a response: %w", err) 
+		return nil, fmt.Errorf("сould not get a response: %w", err)
 	}
 
 	defer response.Body.Close()
