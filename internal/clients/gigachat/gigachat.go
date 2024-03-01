@@ -17,13 +17,14 @@ import (
 type Client struct {
 	GigachatAuthorizationDate string
 	RqUID string
+	Client *http.Client
 }
 
 func New() *Client {
 	GigachatAuthorizationDate, exists := os.LookupEnv("GIGACHAT_AUTH_DATE")
 
 	if !exists {
-		log.Panic("Gigachat_Auth_Date NOT FOUNT IN .env")	
+		log.Panic("Gigachat_Auth_Date NOT FOUNT IN .env", GigachatAuthorizationDate)	
 	}
 
 	RqUID, exists := os.LookupEnv("RqUID")
@@ -32,7 +33,22 @@ func New() *Client {
 		log.Panic("RqUID NOT FOUNT IN .env")
 	}
 
-	return &Client{GigachatAuthorizationDate: GigachatAuthorizationDate, RqUID: RqUID}
+	caCert, err := os.ReadFile("..\\russian_trusted_sub_ca.cer")
+	if err != nil {
+		log.Fatal("Check func makeHTTPSClient ->", err)
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	ClientAccess := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: caCertPool,
+			},
+		},
+	}
+
+	return &Client{GigachatAuthorizationDate: GigachatAuthorizationDate, RqUID: RqUID, Client: ClientAccess}
 }
 
 type accessToken struct {
@@ -99,7 +115,7 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 	req.Header.Add("RqUID", client.RqUID) //это рандом
 	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", client.GigachatAuthorizationDate))
 
-	c := makeHTTPSClient()
+	c := client.Client
 	response, err := c.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("сould not get a response: %w", err)
@@ -119,24 +135,6 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 
 }
 
-func makeHTTPSClient() *http.Client {
-	caCert, err := os.ReadFile("C:\\Users\\alex\\Desktop\\github\\russian_trusted_sub_ca.cer")
-	if err != nil {
-		log.Fatal("Check func makeHTTPSClient ->", err)
-	}
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
-
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
-			},
-		},
-	}
-
-	return client
-}
 
 func (client *Client) Request(text string) ([]string, error) {
 
@@ -176,7 +174,7 @@ func (client *Client) Request(text string) ([]string, error) {
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token.AccessToken))
 
-	c := makeHTTPSClient()
+	c := client.Client
 	response, err := c.Do(req)
 
 	if err != nil {
