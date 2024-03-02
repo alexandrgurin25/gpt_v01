@@ -21,7 +21,7 @@ func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 		return
 	}
 
-	answer, err := h.service.Create("5d0b8e8a-f38d-4767-ac03-ac171429da4e", update.Message.Text)
+	answer, err := h.service.Create("adfc5c8f-c94e-4326-9836-4eea1431412c", update.Message.Text)
 
 	if err != nil {
 		log.Println("", err)

@@ -81,7 +81,7 @@ func (s *Service) countAvailableQuestions(questions []entity.Question, userId st
 }
 
 func (s *Service) filterUserId(questions []entity.Question, userId string) []entity.Question {
-	userQuestions := make([]entity.Question, 0, 0)
+	userQuestions := make([]entity.Question, 0)
 
 	for i := 0; i < len(questions); i++ {
 		if userId == questions[i].UserId {
@@ -94,7 +94,7 @@ func (s *Service) filterUserId(questions []entity.Question, userId string) []ent
 
 func (s *Service) filterTime(userQuestions []entity.Question) []entity.Question {
 
-	userIntervalQuestions := make([]entity.Question, 0, 0)
+	userIntervalQuestions := make([]entity.Question, 0)
 
 	for i := 0; i < len(userQuestions); i++ {
 

@@ -49,6 +49,7 @@ func (a *app) Start() {
 
 	userRepository := user_repository.New(dataBase)
 	questionRepository := question_repository.New(dataBase)
+
 	gigachat := gigachat.New()
 
 	/*
@@ -56,15 +57,15 @@ func (a *app) Start() {
 		нейронных сетей, поэтому пока используем наиболее простую (GigaChat)
 	*/
 	//gptchat := openai.New()
-
-	loginService := login_service.New(userRepository)
+	
 	registerService := register_service.New(userRepository)
+	loginService := login_service.New(userRepository)
 	questionService := question_service.New(questionRepository, gigachat)
 
 	telegramHadler := create_question_telegram_handler.New(questionService)
 
-	loginHandler := login_handler.New(loginService)
 	registerHandler := register_handler.New(registerService)
+	loginHandler := login_handler.New(loginService)
 	createQuestionHandler := create_question_handler.New(questionService)
 	getAvailableQuestionsCountHandler := get_available_questions_count_handler.New(questionService)
 
