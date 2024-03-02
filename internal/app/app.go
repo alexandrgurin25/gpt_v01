@@ -23,6 +23,7 @@ import (
 	"app/internal/service/login_service"
 	"app/internal/service/question_service"
 	"app/internal/service/register_service"
+	create_question_telegram_handler "app/internal/telegram/handlers/create_question_handler"
 )
 
 type app struct {
@@ -31,7 +32,6 @@ type app struct {
 func New() *app {
 	return &app{}
 }
-
 
 func (a *app) Start() {
 	if err := godotenv.Load(); err != nil {
@@ -52,8 +52,8 @@ func (a *app) Start() {
 	gigachat := gigachat.New()
 
 	/*
-	Пока не решена дальшейшая реализация 2 одновременно работающих 
-	нейронных сетей, поэтому пока используем наиболее простую (GigaChat)
+		Пока не решена дальшейшая реализация 2 одновременно работающих
+		нейронных сетей, поэтому пока используем наиболее простую (GigaChat)
 	*/
 	//gptchat := openai.New()
 
@@ -61,25 +61,25 @@ func (a *app) Start() {
 	registerService := register_service.New(userRepository)
 	questionService := question_service.New(questionRepository, gigachat)
 
+	telegramHadler := create_question_telegram_handler.New(questionService)
+
 	loginHandler := login_handler.New(loginService)
 	registerHandler := register_handler.New(registerService)
 	createQuestionHandler := create_question_handler.New(questionService)
 	getAvailableQuestionsCountHandler := get_available_questions_count_handler.New(questionService)
 
 	go func() {
-		TelegramChatApi, exists := os.LookupEnv("TELEGRAM_BOT_API")
+		telegramChatApi, exists := os.LookupEnv("TELEGRAM_BOT_API")
 
 		if !exists {
 			log.Println("TelegramChatApi NOT FOUNT IN .env %w", err)
 		}
 
-		bot, err := tgbotapi.NewBotAPI(TelegramChatApi)
+		bot, err := tgbotapi.NewBotAPI(telegramChatApi)
 		if err != nil {
 			log.Println("Failed to create Telegram bot:", err)
 			return
 		}
-		
-		//bot.Debug = true
 
 		updateConfig := tgbotapi.NewUpdate(0)
 
@@ -88,30 +88,7 @@ func (a *app) Start() {
 		updates := bot.GetUpdatesChan(updateConfig)
 
 		for update := range updates {
-			if update.Message == nil {
-				continue
-			}
-
-			gigachatResponses, err := gigachat.Request(update.Message.Text)
-
-			if err != nil {
-				fmt.Println(err)
-				continue // Отобразить в чате
-			}
-
-			for _, response := range gigachatResponses {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, response)
-				msg.ReplyToMessageID = update.Message.MessageID
-
-				if _, err := bot.Send(msg); err != nil {
-					if _, err := bot.Send(msg); err != nil {
-						log.Println("Failed to send message via Telegram bot:", err)
-						continue
-					}
-				}
-			}
-			
-
+			telegramHadler.Handle(update, bot)
 		}
 	}()
 
@@ -139,51 +116,4 @@ func (a *app) Start() {
 
 	// Запуск HTTP-сервера и обработка запросов с помощью роутера
 	log.Fatal(http.ListenAndServe(":8080", router))
-}
-
-func (a *app) StartTelegram() {
-	TelegramChatApi, exists := os.LookupEnv("TELEGRAM_BOT_API ")
-
-	if !exists {
-		log.Println("TelegramChatApi NOT FOUNT IN .env ")
-	}
-
-	bot, err := tgbotapi.NewBotAPI(TelegramChatApi)
-	if err != nil {
-		log.Println("Failed to create Telegram bot:", err)
-		return
-	}
-
-	bot.Debug = false
-
-	updateConfig := tgbotapi.NewUpdate(0)
-
-	updateConfig.Timeout = 10
-
-	updates := bot.GetUpdatesChan(updateConfig)
-
-	for update := range updates {
-
-		if update.Message == nil {
-			continue
-		}
-
-		update.Message.Text = fmt.Sprintf("Здравствуйте, %s!\n"+
-			"В данный момент бот находится на обучении!\n"+
-			"Когда бот будет готов, то сообщим Вам.\n\n%s писал боту: %s", update.Message.Chat.FirstName, update.Message.Chat.FirstName, update.Message.Text)
-
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-
-		fmt.Println(update)
-
-		msg.ReplyToMessageID = update.Message.MessageID
-
-		if _, err := bot.Send(msg); err != nil {
-
-			if _, err := bot.Send(msg); err != nil {
-				log.Println("Failed to send message via Telegram bot:", err)
-				continue
-			}
-		}
-	}
 }

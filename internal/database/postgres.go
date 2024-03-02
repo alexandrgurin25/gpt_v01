@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	//"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5"
@@ -19,31 +19,34 @@ type DataBase struct {
 // New создает новое соединение с базой данных и выполняет миграции.
 func New() (*DataBase, error) {
 	connURL := createConnectionURL()
-	connConfig, _ := pgx.ParseConfig(connURL)
+	connConfig, err := pgx.ParseConfig(connURL)
+	if err != nil {
+		return nil, fmt.Errorf("could not create ConnConfig: %v", err)
+	}
 
 	conn, err := pgx.ConnectConfig(context.Background(), connConfig)
 	if err != nil {
-		return nil, fmt.Errorf("unable to connect to the database: %v\n", err)
+		return nil, fmt.Errorf("unable to connect to the database: %v", err)
 	}
 
-	log.Printf("Postgres connected")
+	log.Printf("Postgres connected successfull")
 
 	db := DataBase{
 		Conn: conn,
 	}
 
-	// m, err := migrate.New(
-	// 	"file://internal/database/migrations",
-	// 	connURL,
-	// )
-	// if err != nil {
-	// 	return nil, fmt.Errorf("unable to migrate the database: %v\n", err)
-	// }
+	m, err := migrate.New(
+		"file://internal/database/migrations",
+		connURL,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("unable to migrate the database: %v", err)
+	}
 
-	// err = m.Up()
-	// if err != nil {
-	// 	log.Printf("Unable to migrate the database: %v\n", err)
-	// }
+	err = m.Up()
+	if err != nil {
+		log.Printf("Unable to migrate the database: %v\n", err)
+	}
 
 	return &db, nil
 }

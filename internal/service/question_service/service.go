@@ -9,7 +9,7 @@ import (
 	"app/internal/repository/question_repository"
 )
 
-type AnswerClient interface {
+type AnswerClient interface { 
 	Request(text string) ([]string, error)
 }
 
@@ -18,9 +18,6 @@ type Service struct {
 	answerClient AnswerClient
 }
 
-// func New(repo *question_repository.Repository, chatGC *gigachat.Client) *Service {
-// 	return &Service{repo: repo, chatGC: chatGC}
-// }
 
 func New(repo *question_repository.Repository, answerClient AnswerClient) *Service {
 	return &Service{repo: repo, answerClient: answerClient}
