@@ -18,7 +18,10 @@ type tokenData struct {
 }
 
 func AuthMiddleware(next http.Handler) http.Handler {
-	secretKey, exists := os.LookupEnv("AUTH_SECRET_KEY")
+	secretKeyString, exists := os.LookupEnv("AUTH_SECRET_KEY")
+
+	secretKey := []byte(secretKeyString)
+
 	if !exists {
 		log.Fatal("AUTH_SECRET_KEY not founded")
 	}
@@ -35,12 +38,10 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		token, err := jwt.ParseWithClaims(accessTokenString, &tokenData{}, func(token *jwt.Token) (interface{}, error) {
 			return secretKey, nil
 		})
-
 		ctx := r.Context()
 
 		if data, ok := token.Claims.(*tokenData); ok && token.Valid {
 			expirationTime := time.Now().Add(common.ExpirationTime).Unix()
-
 			if data.CreatedAt > expirationTime {
 				log.Print("accessToken timed out")
 				common.HandleHttpError(w, common.ForbiddenError)
