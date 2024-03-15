@@ -2,6 +2,7 @@ package create_question_handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"app/internal/service/question_service"
@@ -36,6 +37,7 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 	result, err := h.service.Create(userId, in.Text)
 
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

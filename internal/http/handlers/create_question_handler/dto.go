@@ -5,5 +5,5 @@ type CreateQuestionDtoIn struct {
 }
 
 type CreateQuestionDtoOut struct {
-	Text string `json:"text"`
+	Texts []string `json:"texts"`
 }

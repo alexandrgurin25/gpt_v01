@@ -1,28 +1,31 @@
 package openai
 
 import (
-	"app/internal/common"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 )
 
 type Client struct {
+	openApiKey string
 }
 
 func New() *Client {
-	return &Client{}
+	openApiKey, exists := os.LookupEnv("OPENAI_API_KEY")
+
+	if !exists {
+		log.Panic("OPENAI_API_KEY NOT FOUNT IN .env")
+	}
+
+	return &Client{openApiKey: openApiKey}
 }
 
 type body struct {
-	Model          string       `json:"model"`
-	ResponseFormat jsonResponse `json:"response_format"`
-	Messages       []messageGpt `json:"messages"`
-}
-
-type jsonResponse struct {
-	TypeResp string `json:"type"`
+	Model    string       `json:"model"`
+	Messages []messageGpt `json:"messages"`
 }
 
 type messageGpt struct {
@@ -55,12 +58,11 @@ type choice struct {
 
 func (client *Client) Request(text string) ([]string, error) {
 	body := body{
-		Model:          "gpt-3.5-turbo",
-		ResponseFormat: jsonResponse{TypeResp: "json_object"},
+		Model: "gpt-3.5-turbo",
 		Messages: []messageGpt{
 			{
 				Role:    "system",
-				Content: "Ты помощник, который работает в России. А также возвращай сообщения в формате json",
+				Content: "Ты помощник, который работает в России.",
 			},
 			{
 				Role:    "user",
@@ -71,7 +73,7 @@ func (client *Client) Request(text string) ([]string, error) {
 
 	bytesRepresentation, err := json.Marshal(body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("json.Marshal could not return JSON encoding: %w", err)
 	}
 
 	req, err := http.NewRequest(
@@ -80,16 +82,16 @@ func (client *Client) Request(text string) ([]string, error) {
 		bytes.NewBuffer(bytesRepresentation),
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("NewRequest could not send request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", common.OPENAIAPIKEY))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", client.openApiKey))
 
 	c := &http.Client{}
 	response, err := c.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("сould not get a response: %w", err)
 	}
 
 	defer response.Body.Close()
@@ -99,10 +101,9 @@ func (client *Client) Request(text string) ([]string, error) {
 	err = json.NewDecoder(response.Body).Decode(&result)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("NewDecoder cound not return decoder %w", err)
 	}
 
-	fmt.Println(result.Choices)
 	answers := make([]string, 0, len(result.Choices))
 
 	for _, answer := range result.Choices {
