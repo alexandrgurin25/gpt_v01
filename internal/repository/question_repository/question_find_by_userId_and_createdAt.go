@@ -9,14 +9,17 @@ import (
 	"time"
 )
 
-func (r *Repository) FindByUserIdAndCreatedAt(userId string) (int, error) {
+func (r *Repository) CountQuestionsByUserIdAtToday(userId string) (int, error) {
 	var countQuery int
-
+	
 	err := r.db.QueryRow(
 		context.Background(),
-		"SELECT COUNT(user_id) FROM questions WHERE user_id = $1",
+		"SELECT COUNT(*) FROM questions WHERE user_id = $1 and created_at > NOW() - INTERVAL '1 day'",
 		userId,
+
 	).Scan(&countQuery)
+
+	fmt.Println(countQuery)
 
 	if err != nil {
 		log.Printf("%v", err)
