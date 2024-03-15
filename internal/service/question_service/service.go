@@ -57,16 +57,15 @@ func (s *Service) AvailableCount(userId string) (int, error) {
 }
 
 func (s *Service) checkLimit(userId string) error {
-	questions, err := s.repo.FindAll()
+	//questions, err := s.repo.FindAll()
+	countQuestions, err := s.repo.FindByUserIdAndCreatedAt(userId)
 
 	if err != nil {
 		return err
 	}
 
-	count := s.countAvailableQuestions(questions, userId)
-
-	if count >= common.MaxQuestionCount {
-		log.Printf("У пользователя %s превышен порог запросов: %d > %d", userId, count, common.MaxQuestionCount)
+	if countQuestions >= common.MaxQuestionCount {
+		log.Printf("У пользователя %s превышен порог запросов: %d > %d", userId, countQuestions, common.MaxQuestionCount)
 		return common.InternalError
 	}
 
