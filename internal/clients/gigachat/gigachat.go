@@ -12,25 +12,20 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Client struct {
 	GigachatAuthorizationDate string
-	RqUID string
-	Client *http.Client
+	Client                    *http.Client
 }
 
 func New() *Client {
 	GigachatAuthorizationDate, exists := os.LookupEnv("GIGACHAT_AUTH_DATE")
 
 	if !exists {
-		log.Panic("Gigachat_Auth_Date NOT FOUNT IN .env", GigachatAuthorizationDate)	
-	}
-
-	RqUID, exists := os.LookupEnv("RqUID")
-
-	if !exists {
-		log.Panic("RqUID NOT FOUNT IN .env")
+		log.Panic("Gigachat_Auth_Date NOT FOUNT IN .env", GigachatAuthorizationDate)
 	}
 
 	caCert, err := os.ReadFile("..\\russian_trusted_sub_ca.cer")
@@ -40,7 +35,7 @@ func New() *Client {
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
 
-	ClientAccess := &http.Client{
+	clientAccess := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				RootCAs: caCertPool,
@@ -48,7 +43,7 @@ func New() *Client {
 		},
 	}
 
-	return &Client{GigachatAuthorizationDate: GigachatAuthorizationDate, RqUID: RqUID, Client: ClientAccess}
+	return &Client{GigachatAuthorizationDate: GigachatAuthorizationDate, Client: clientAccess}
 }
 
 type accessToken struct {
@@ -97,6 +92,8 @@ type choices struct {
 
 func (client *Client) RequestAuth() (*accessToken, error) {
 
+	rqUID := uuid.New()
+
 	data := url.Values{}
 	data.Set("scope", "GIGACHAT_API_PERS")
 	req, err := http.NewRequest(
@@ -109,10 +106,9 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 		return nil, err
 	}
 
-	
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Accept", "application/json")
-	req.Header.Add("RqUID", client.RqUID) //это рандом
+	req.Header.Add("RqUID", rqUID.String()) //это рандом
 	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", client.GigachatAuthorizationDate))
 
 	c := client.Client
@@ -134,7 +130,6 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 	return &result, nil
 
 }
-
 
 func (client *Client) Request(text string) ([]string, error) {
 
@@ -191,7 +186,6 @@ func (client *Client) Request(text string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("NewDecoder cound not return decoder %w", err)
 	}
-
 
 	answers := make([]string, 0, len(resAns.Choices))
 
