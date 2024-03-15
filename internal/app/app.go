@@ -53,7 +53,7 @@ func (a *app) Start() {
 	gigachat := gigachat.New()
 
 	/*
-		Пока не решена дальшейшая реализация 2 одновременно работающих
+		Пока не решена дальнейшая реализация 2 одновременно работающих
 		нейронных сетей, поэтому пока используем наиболее простую (GigaChat)
 	*/
 	//gptchat := openai.New()
@@ -62,7 +62,7 @@ func (a *app) Start() {
 	loginService := login_service.New(userRepository)
 	questionService := question_service.New(questionRepository, gigachat)
 
-	telegramHadler := create_question_telegram_handler.New(questionService)
+	telegramHandler := create_question_telegram_handler.New(questionService)
 
 	registerHandler := register_handler.New(registerService)
 	loginHandler := login_handler.New(loginService)
@@ -89,7 +89,7 @@ func (a *app) Start() {
 		updates := bot.GetUpdatesChan(updateConfig)
 
 		for update := range updates {
-			telegramHadler.Handle(update, bot)
+			telegramHandler.Handle(update, bot)
 		}
 	}()
 
