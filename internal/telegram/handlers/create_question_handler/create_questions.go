@@ -20,6 +20,8 @@ func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 	if update.Message == nil {
 		return
 	}
+// Получить из базы данных получить userId по chatId
+// Метод репозитория getUserByChatId
 
 	answer, err := h.service.Create("adfc5c8f-c94e-4326-9836-4eea1431412c", update.Message.Text)
 

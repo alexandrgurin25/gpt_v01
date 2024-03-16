@@ -40,14 +40,14 @@ func (s *Service) Create(userId string, text string) (*entity.Answer, error) {
 }
 
 func (s *Service) AvailableCount(userId string) (int, error) {
-	questions, err := s.repo.FindAll()
+	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(userId, time.Now().AddDate(0, 0, -1))
 	var currentCount int
 
 	if err != nil {
 		return 0, err
 	}
-	// func countQuestions return count questions(int)
-	currentCount = common.MaxQuestionCount - s.countAvailableQuestions(questions, userId)
+
+	currentCount = common.MaxQuestionCount - countQuestions
 
 	if currentCount < 0 {
 		return 0, nil
@@ -56,7 +56,7 @@ func (s *Service) AvailableCount(userId string) (int, error) {
 }
 
 func (s *Service) checkLimit(userId string) error {
-	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(userId)
+	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(userId, time.Now().AddDate(0, 0, -1))
 
 	if err != nil {
 		return err
@@ -68,45 +68,4 @@ func (s *Service) checkLimit(userId string) error {
 	}
 
 	return nil
-}
-
-func (s *Service) countAvailableQuestions(questions []entity.Question, userId string) int {
-	userQuestions := s.filterUserId(questions, userId)
-	userIntervalQuestions := s.filterTime(userQuestions)
-
-	return len(userIntervalQuestions)
-}
-
-func (s *Service) filterUserId(questions []entity.Question, userId string) []entity.Question {
-	userQuestions := make([]entity.Question, 0)
-
-	for i := 0; i < len(questions); i++ {
-		if userId == questions[i].UserId {
-			userQuestions = append(userQuestions, questions[i])
-		}
-	}
-
-	return userQuestions
-}
-
-func (s *Service) filterTime(userQuestions []entity.Question) []entity.Question {
-
-	userIntervalQuestions := make([]entity.Question, 0)
-
-	for i := 0; i < len(userQuestions); i++ {
-
-		createdAtTime, err := time.Parse(common.SQLTimestampFormatTemplate, string((userQuestions[i].CreatedAt)))
-
-		if err != nil {
-			log.Printf("%v", err)
-			continue
-		}
-
-		if time.Now().Unix()-createdAtTime.Unix() < common.QuestionsRateLimitInterval {
-
-			userIntervalQuestions = append(userIntervalQuestions, userQuestions[i])
-
-		}
-	}
-	return userIntervalQuestions
 }

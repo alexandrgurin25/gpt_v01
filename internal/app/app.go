@@ -38,7 +38,6 @@ func (a *app) Start() {
 		log.Print("No .env file found")
 	}
 
-	// Создаем новое подключение к базе данных
 	dataBase, err := database.New()
 
 	if err != nil {
@@ -89,6 +88,11 @@ func (a *app) Start() {
 		updates := bot.GetUpdatesChan(updateConfig)
 
 		for update := range updates {
+
+			
+			// Если команда /start, то вызываем telegram/addUserHandler
+			// Надо сделать telegramUserService и telegramAddUserRepository
+			// Репозиторий смотреть по аналогии на userRepositoryCreate
 			telegramHandler.Handle(update, bot)
 		}
 	}()
