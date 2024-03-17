@@ -2,17 +2,19 @@ package create_question_telegram_handler
 
 import (
 	"app/internal/service/question_service"
+	"app/internal/service/telegram_user_service"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type handler struct {
-	service *question_service.Service
+	question_service *question_service.Service
+	telegram_service *telegram_user_service.Service
 }
 
-func New(service *question_service.Service) *handler {
-	return &handler{service: service}
+func New(qService *question_service.Service, tService *telegram_user_service.Service) *handler {
+	return &handler{question_service: qService, telegram_service: tService}
 }
 
 func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
@@ -20,10 +22,14 @@ func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 	if update.Message == nil {
 		return
 	}
-// Получить из базы данных получить userId по chatId
-// Метод репозитория getUserByChatId
 
-	answer, err := h.service.Create("adfc5c8f-c94e-4326-9836-4eea1431412c", update.Message.Text)
+	user, err := h.telegram_service.CreateFieldUserId(update.Message.Chat.ID)
+	if err != nil {
+		log.Println("", err)
+		return
+	}
+
+	answer, err := h.question_service.Create(user.UserId, update.Message.Text)
 
 	if err != nil {
 		log.Println("", err)
