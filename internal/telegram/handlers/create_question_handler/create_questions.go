@@ -2,17 +2,19 @@ package create_question_telegram_handler
 
 import (
 	"app/internal/service/question_service"
+	"app/internal/service/telegram_user_service"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type handler struct {
-	service *question_service.Service
+	questionService *question_service.Service
+	telegramService *telegram_user_service.Service
 }
 
-func New(service *question_service.Service) *handler {
-	return &handler{service: service}
+func New(qService *question_service.Service, tService *telegram_user_service.Service) *handler {
+	return &handler{questionService: qService, telegramService: tService}
 }
 
 func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
@@ -21,7 +23,13 @@ func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 		return
 	}
 
-	answer, err := h.service.Create("adfc5c8f-c94e-4326-9836-4eea1431412c", update.Message.Text)
+	user, err := h.telegramService.CreateUserIdByChatId(update.Message.Chat.ID)
+	if err != nil {
+		log.Println("", err)
+		return
+	}
+
+	answer, err := h.questionService.Create(user.UserId, update.Message.Text)
 
 	if err != nil {
 		log.Println("", err)

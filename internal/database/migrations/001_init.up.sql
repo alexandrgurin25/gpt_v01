@@ -14,3 +14,6 @@ CREATE TABLE IF NOT EXISTS questions (
 
   CONSTRAINT fk_questions_user_id FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
+
+--Создать вторую миграцию -> Создать вторую таблицу telegramUsers, в таблице будет 2 колонки 
+--userId(генерировать uuid) и chatId

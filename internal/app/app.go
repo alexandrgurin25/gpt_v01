@@ -19,10 +19,13 @@ import (
 	"app/internal/http/handlers/register_handler"
 	"app/internal/http/middlewares"
 	"app/internal/repository/question_repository"
+	"app/internal/repository/telegram_user_repository"
 	"app/internal/repository/user_repository"
 	"app/internal/service/login_service"
 	"app/internal/service/question_service"
 	"app/internal/service/register_service"
+	"app/internal/service/telegram_user_service"
+	"app/internal/telegram/handlers/add_user_handler"
 	create_question_telegram_handler "app/internal/telegram/handlers/create_question_handler"
 )
 
@@ -38,7 +41,6 @@ func (a *app) Start() {
 		log.Print("No .env file found")
 	}
 
-	// Создаем новое подключение к базе данных
 	dataBase, err := database.New()
 
 	if err != nil {
@@ -49,6 +51,7 @@ func (a *app) Start() {
 
 	userRepository := user_repository.New(dataBase)
 	questionRepository := question_repository.New(dataBase)
+	telegramUserRepository := telegram_user_repository.New(dataBase)
 
 	gigachat := gigachat.New()
 
@@ -57,12 +60,14 @@ func (a *app) Start() {
 		нейронных сетей, поэтому пока используем наиболее простую (GigaChat)
 	*/
 	//gptchat := openai.New()
-	
+
 	registerService := register_service.New(userRepository)
 	loginService := login_service.New(userRepository)
 	questionService := question_service.New(questionRepository, gigachat)
+	telegramUserService := telegram_user_service.New(telegramUserRepository)
 
-	telegramHandler := create_question_telegram_handler.New(questionService)
+	telegramAddHandler := add_user_handler.New(telegramUserService)
+	telegramHandler := create_question_telegram_handler.New(questionService, telegramUserService)
 
 	registerHandler := register_handler.New(registerService)
 	loginHandler := login_handler.New(loginService)
@@ -89,6 +94,14 @@ func (a *app) Start() {
 		updates := bot.GetUpdatesChan(updateConfig)
 
 		for update := range updates {
+			/*
+				Если команда /start, то вызываем telegram\handler\add_user_handler\handler
+				Для того, чтобы записать пользователя по chatId в базу данных и присвоить уникальный UUID
+			*/
+			switch update.Message.Command() {
+			case "start":
+				telegramAddHandler.Handle(update, bot)
+			}
 			telegramHandler.Handle(update, bot)
 		}
 	}()

@@ -114,7 +114,7 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 	c := client.Client
 	response, err := c.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("сould not get a response: %w", err)
+		return nil, fmt.Errorf("couldn't get a response: %w", err)
 	}
 
 	defer response.Body.Close()
@@ -124,7 +124,7 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 	err = json.NewDecoder(response.Body).Decode(&result)
 
 	if err != nil {
-		return nil, fmt.Errorf("NewDecoder cound not return decoder %w", err)
+		return nil, fmt.Errorf("NewDecoder couldn't return decoder %w", err)
 	}
 
 	return &result, nil
@@ -184,7 +184,7 @@ func (client *Client) Request(text string) ([]string, error) {
 	err = json.NewDecoder(response.Body).Decode(&resAns)
 
 	if err != nil {
-		return nil, fmt.Errorf("NewDecoder cound not return decoder %w", err)
+		return nil, fmt.Errorf("NewDecoder couldn't return decoder %w", err)
 	}
 
 	answers := make([]string, 0, len(resAns.Choices))
