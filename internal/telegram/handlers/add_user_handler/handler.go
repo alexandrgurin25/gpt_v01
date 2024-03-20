@@ -18,16 +18,21 @@ func New(service *telegram_user_service.Service) *handler {
 
 func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 
-	_, err := h.service.CreateFieldUserId(update.Message.Chat.ID)
+	_, err := h.service.CreateUserIdByChatId(update.Message.Chat.ID)
+
+	if(err != nil){
+		log.Println("add_user_handler.Handle couldn't CreateUserIdByChatId->",err)
+	}
 
 	messageCommandStart := fmt.Sprintf("Добро пожаловать, %s! Я - нейросетевая языковая модель, созданная командой @alexan_25."+
 		"Я могу помочь вам с различными задачами, такими как написание текстов, ответы на вопросы, перевод с одного языка на"+
 		" другой и многое другое.  Если у вас есть какие-либо вопросы или запросы, не стесняйтесь обращаться ко мне.",
 		update.Message.Chat.FirstName)
 
-	bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, messageCommandStart))
+	
+	_, err = bot.Send(tgbotapi.NewMessage(update.Message.Chat.ID, messageCommandStart))
 
 	if err != nil {
-		log.Println("", err)
+		log.Println("add_user_handler.Handle bot couldn't send messageCommandStart", err)
 	}
 }

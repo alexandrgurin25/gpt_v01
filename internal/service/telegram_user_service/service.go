@@ -14,7 +14,7 @@ func New(repo *telegram_user_repository.Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) CreateFieldUserId(chatId int64) (*entity.TelegramUser, error) {
+func (s *Service) CreateUserIdByChatId(chatId int64) (*entity.TelegramUser, error) {
 
 	user, err := s.repo.CreateOrUpdateUserId(chatId)
 

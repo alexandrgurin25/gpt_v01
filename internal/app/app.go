@@ -67,7 +67,7 @@ func (a *app) Start() {
 	telegramUserService := telegram_user_service.New(telegramUserRepository)
 
 	telegramAddHandler := add_user_handler.New(telegramUserService)
-	telegramHandler := create_question_telegram_handler.New(questionService,telegramUserService)
+	telegramHandler := create_question_telegram_handler.New(questionService, telegramUserService)
 
 	registerHandler := register_handler.New(registerService)
 	loginHandler := login_handler.New(loginService)
@@ -94,16 +94,14 @@ func (a *app) Start() {
 		updates := bot.GetUpdatesChan(updateConfig)
 
 		for update := range updates {
-			//fmt.Println(update.Message.Chat.ID)
-
+			/*
+				Если команда /start, то вызываем telegram\handler\add_user_handler\handler
+				Для того, чтобы записать пользователя по chatId в базу данных и присвоить уникальный UUID
+			*/
 			switch update.Message.Command() {
 			case "start":
 				telegramAddHandler.Handle(update, bot)
 			}
-
-			// Если команда /start, то вызываем telegram/addUserHandler
-			// Надо сделать telegramUserService и telegramAddUserRepository
-			// Репозиторий смотреть по аналогии на userRepositoryCreate
 			telegramHandler.Handle(update, bot)
 		}
 	}()

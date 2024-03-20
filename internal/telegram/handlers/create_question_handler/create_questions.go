@@ -9,12 +9,12 @@ import (
 )
 
 type handler struct {
-	question_service *question_service.Service
-	telegram_service *telegram_user_service.Service
+	questionService *question_service.Service
+	telegramService *telegram_user_service.Service
 }
 
 func New(qService *question_service.Service, tService *telegram_user_service.Service) *handler {
-	return &handler{question_service: qService, telegram_service: tService}
+	return &handler{questionService: qService, telegramService: tService}
 }
 
 func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
@@ -23,13 +23,13 @@ func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 		return
 	}
 
-	user, err := h.telegram_service.CreateFieldUserId(update.Message.Chat.ID)
+	user, err := h.telegramService.CreateUserIdByChatId(update.Message.Chat.ID)
 	if err != nil {
 		log.Println("", err)
 		return
 	}
 
-	answer, err := h.question_service.Create(user.UserId, update.Message.Text)
+	answer, err := h.questionService.Create(user.UserId, update.Message.Text)
 
 	if err != nil {
 		log.Println("", err)
