@@ -29,7 +29,7 @@ func New() (*DataBase, error) {
 		return nil, fmt.Errorf("unable to connect to the database: %v", err)
 	}
 
-	log.Printf("Postgres connected successfull")
+	log.Printf("Postgres connected successful")
 
 	db := DataBase{
 		Conn: conn,

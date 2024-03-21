@@ -10,17 +10,17 @@ import (
 )
 
 type Client struct {
-	openApiKey string
+	openAPIKey string
 }
 
 func New() *Client {
-	openApiKey, exists := os.LookupEnv("OPENAI_API_KEY")
+	openAPIKey, exists := os.LookupEnv("OPENAI_API_KEY")
 
 	if !exists {
 		log.Panic("OPENAI_API_KEY NOT FOUNT IN .env")
 	}
 
-	return &Client{openApiKey: openApiKey}
+	return &Client{openAPIKey: openAPIKey}
 }
 
 type body struct {
@@ -86,7 +86,7 @@ func (client *Client) Request(text string) ([]string, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", client.openApiKey))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", client.openAPIKey))
 
 	c := &http.Client{}
 	response, err := c.Do(req)
@@ -101,7 +101,7 @@ func (client *Client) Request(text string) ([]string, error) {
 	err = json.NewDecoder(response.Body).Decode(&result)
 
 	if err != nil {
-		return nil, fmt.Errorf("NewDecoder cound not return decoder %w", err)
+		return nil, fmt.Errorf("NewDecoder could not return decoder %w", err)
 	}
 
 	answers := make([]string, 0, len(result.Choices))

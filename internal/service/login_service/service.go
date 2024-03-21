@@ -12,13 +12,13 @@ import (
 )
 
 type Service struct {
-	repo *user_repository.Repository
+	repo      *user_repository.Repository
 	secretKey []byte
 }
 
 func New(repo *user_repository.Repository) *Service {
 	secretKey, exists := os.LookupEnv("AUTH_SECRET_KEY")
-	if !exists{
+	if !exists {
 		log.Fatal("AUTH_SECRET_KEY not founded")
 	}
 
@@ -43,7 +43,6 @@ func (s *Service) Login(loginDto LoginDto) (*AuthDto, error) {
 		"sub": user.ID,
 		"iat": time.Now().Unix(),
 	})
-
 
 	accessToken, err := token.SignedString(s.secretKey)
 
