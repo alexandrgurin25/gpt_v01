@@ -78,10 +78,11 @@ func (a *app) Start() {
 		telegramChatApi, exists := os.LookupEnv("TELEGRAM_BOT_API")
 
 		if !exists {
-			log.Println("TelegramChatApi NOT FOUNT IN .env %w", err)
+			log.Println("TELEGRAM_BOT_API NOT FOUNT IN .env %w", "TELEGRAM_BOT_API is not set")
 		}
 
 		bot, err := tgbotapi.NewBotAPI(telegramChatApi)
+
 		if err != nil {
 			log.Println("Failed to create Telegram bot:", err)
 			return

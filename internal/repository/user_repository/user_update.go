@@ -13,7 +13,7 @@ func (r *Repository) Update(id string, email string, passwordHash string) (*enti
 	uuid, err := common.UUIDFromString(id)
 
 	if err != nil {
-		return nil, fmt.Errorf("incorrect user id fromat %w", err)
+		return nil, fmt.Errorf("incorrect user id format %w", err)
 	}
 
 	_, err = r.db.Exec(

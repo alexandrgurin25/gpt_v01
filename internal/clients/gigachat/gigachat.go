@@ -25,7 +25,7 @@ func New() *Client {
 	GigachatAuthorizationDate, exists := os.LookupEnv("GIGACHAT_AUTH_DATE")
 
 	if !exists {
-		log.Panic("Gigachat_Auth_Date NOT FOUNT IN .env", GigachatAuthorizationDate)
+		log.Panic("GIGACHAT_AUTH_DATE NOT FOUNT IN .env", GigachatAuthorizationDate)
 	}
 
 	caCert, err := os.ReadFile("..\\russian_trusted_sub_ca.cer")
@@ -124,7 +124,7 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 	err = json.NewDecoder(response.Body).Decode(&result)
 
 	if err != nil {
-		return nil, fmt.Errorf("NewDecoder couldn't return decoder %w", err)
+		return nil, fmt.Errorf("NewDecoder couldn't return decoder: %v", err)
 	}
 
 	return &result, nil

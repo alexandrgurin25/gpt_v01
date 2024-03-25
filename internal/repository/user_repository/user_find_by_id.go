@@ -13,7 +13,7 @@ func (r *Repository) FindById(id string) (*entity.User, error) {
 	uuid, err := common.UUIDFromString(id)
 
 	if err != nil {
-		return nil, fmt.Errorf("incorrect user id fromat %w", err)
+		return nil, fmt.Errorf("incorrect user id format %w", err)
 	}
 
 	user := entity.User{}

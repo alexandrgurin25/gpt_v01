@@ -28,7 +28,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenHeader := r.Header.Get("Authorization") // получение данных из заголовка
-		
+
 		if len(accessTokenHeader) == 0 || !(strings.HasPrefix(accessTokenHeader, "Bearer ")) { // проверка, что токен начинается с корректного обозначения типа
 			log.Printf("Could not get token %s", accessTokenHeader)
 			common.HandleHttpError(w, common.ForbiddenError)

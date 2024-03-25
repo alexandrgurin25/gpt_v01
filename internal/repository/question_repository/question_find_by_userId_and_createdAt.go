@@ -11,13 +11,12 @@ import (
 
 func (r *Repository) CountQuestionsByUserIdAtToday(userId string, createdAt time.Time) (int, error) {
 	var countQuery int
-	
+
 	err := r.db.QueryRow(
 		context.Background(),
 		"SELECT COUNT(*) FROM questions WHERE user_id = $1 and created_at > $2",
 		userId,
 		createdAt,
-
 	).Scan(&countQuery)
 
 	if err != nil {
