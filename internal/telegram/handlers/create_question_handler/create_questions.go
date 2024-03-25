@@ -24,6 +24,7 @@ func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 	}
 
 	user, err := h.telegramService.CreateUserIdByChatId(update.Message.Chat.ID)
+	
 	if err != nil {
 		log.Println("", err)
 		return

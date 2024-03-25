@@ -15,8 +15,13 @@ func New(repo *telegram_user_repository.Repository) *Service {
 }
 
 func (s *Service) CreateUserIdByChatId(chatId int64) (*entity.TelegramUser, error) {
+	var err error
+	
+	user, err := s.repo.GetUserId(chatId)
 
-	user, err := s.repo.CreateOrUpdateUserId(chatId)
+	if user.UserId == ""{
+		user, err = s.repo.CreateUserId(chatId)
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf("could not add telegram user in db %w", err)
