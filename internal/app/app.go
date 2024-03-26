@@ -102,6 +102,7 @@ func (a *app) Start() {
 			switch update.Message.Command() {
 			case "start":
 				telegramAddHandler.Handle(update, bot)
+				continue
 			}
 			telegramHandler.Handle(update, bot)
 		}
