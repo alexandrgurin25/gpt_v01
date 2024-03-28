@@ -61,7 +61,7 @@ func (s *Service) checkLimit(userId string) error {
 	if err != nil {
 		return err
 	}
-
+	
 	if countQuestions >= common.MaxQuestionCount {
 		log.Printf("У пользователя %s превышен порог запросов: %d > %d", userId, countQuestions, common.MaxQuestionCount)
 		return common.InternalError

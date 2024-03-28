@@ -124,7 +124,7 @@ func (client *Client) RequestAuth() (*accessToken, error) {
 	err = json.NewDecoder(response.Body).Decode(&result)
 
 	if err != nil {
-		return nil, fmt.Errorf("NewDecoder couldn't return decoder: %v", err)
+		return nil, fmt.Errorf("NewDecoder couldn't return decoder: %w", err)
 	}
 
 	return &result, nil
