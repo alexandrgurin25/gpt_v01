@@ -20,12 +20,12 @@ func (r *Repository) CreateUserId(chatID int64) (*entity.TelegramUser, error) {
 		chatID,
 	)
 
-	defer rows.Close()
-
 	if err != nil {
 		log.Printf("%v", err)
 		return nil, fmt.Errorf("repository user create error: %w", err)
 	}
+
+	defer rows.Close()
 
 	result := &entity.TelegramUser{
 		UserId: userId.String(),

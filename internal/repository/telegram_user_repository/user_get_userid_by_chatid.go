@@ -21,7 +21,7 @@ func (r *Repository) GetUserId(chatID int64) (*entity.TelegramUser, error) {
 
 	if err != nil {
 		log.Printf("%v", err)
-		return nil, fmt.Errorf("repository user create error %w", err)
+		return nil, fmt.Errorf("repository GetUserId error %w", err)
 	}
 
 	result := &entity.TelegramUser{
