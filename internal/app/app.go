@@ -18,6 +18,7 @@ import (
 	"app/internal/http/handlers/login_handler"
 	"app/internal/http/handlers/register_handler"
 	"app/internal/http/middlewares"
+	"app/internal/repository/premium_repository"
 	"app/internal/repository/question_repository"
 	"app/internal/repository/telegram_user_repository"
 	"app/internal/repository/user_repository"
@@ -52,6 +53,7 @@ func (a *app) Start() {
 	userRepository := user_repository.New(dataBase)
 	questionRepository := question_repository.New(dataBase)
 	telegramUserRepository := telegram_user_repository.New(dataBase)
+	premiumRepository := premium_repository.New(dataBase)
 
 	gigachat := gigachat.New()
 
@@ -63,7 +65,7 @@ func (a *app) Start() {
 
 	registerService := register_service.New(userRepository)
 	loginService := login_service.New(userRepository)
-	questionService := question_service.New(questionRepository, gigachat)
+	questionService := question_service.New(questionRepository, gigachat, premiumRepository)
 	telegramUserService := telegram_user_service.New(telegramUserRepository)
 
 	telegramAddHandler := add_user_handler.New(telegramUserService)
