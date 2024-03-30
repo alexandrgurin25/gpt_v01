@@ -3,9 +3,13 @@ package question_service
 import (
 	"app/internal/common"
 	"app/internal/entity"
+<<<<<<< HEAD
 	"app/internal/service/premium_service"
 	"context"
 	"fmt"
+=======
+	"context"
+>>>>>>> c1bee4d (added integration tests)
 	"log"
 	"time"
 
@@ -64,17 +68,21 @@ func (s *Service) AvailableCount(ctx context.Context, userId string) (int, error
 
 func (s *Service) checkLimit(ctx context.Context, userId string) error {
 	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(ctx, userId, time.Now().AddDate(0, 0, -1))
+<<<<<<< HEAD
 
 	if err != nil {
 		return fmt.Errorf("question_service checkLimit error: %w", err)
 	}
 
 	checkPremium, err := s.premiumService.CheckPremium(ctx, userId)
+=======
+>>>>>>> c1bee4d (added integration tests)
 
 	if err != nil {
 		return err
 	}
 
+<<<<<<< HEAD
 	if checkPremium {
 		if countQuestions >= common.MaxQuestionCountPremium {
 			log.Printf("У пользователя %s c ПРЕМИУМ доступом превышен порог запросов: %d > %d", userId, countQuestions, common.MaxQuestionCount)
@@ -85,6 +93,11 @@ func (s *Service) checkLimit(ctx context.Context, userId string) error {
 			log.Printf("У пользователя %s превышен порог запросов: %d > %d", userId, countQuestions, common.MaxQuestionCount)
 			return common.InternalError
 		}
+=======
+	if countQuestions >= common.MaxQuestionCount {
+		log.Printf("У пользователя %s превышен порог запросов: %d > %d", userId, countQuestions, common.MaxQuestionCount)
+		return common.InternalError
+>>>>>>> c1bee4d (added integration tests)
 	}
 
 	return nil
