@@ -11,9 +11,9 @@ import (
 )
 
 // FindAll возвращает всех пользователей.
-func (r *Repository) FindAll() ([]entity.User, error) {
+func (r *Repository) FindAll(ctx context.Context) ([]entity.User, error) {
 	rows, err := r.db.Query(
-		context.Background(),
+		ctx,
 		`SELECT * FROM "users"`,
 	)
 	defer rows.Close()

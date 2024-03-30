@@ -8,11 +8,11 @@ import (
 )
 
 // FindByEmail возвращает пользователя по адресу электронной почты.
-func (r *Repository) FindByEmail(email string) (*entity.User, error) {
+func (r *Repository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
 	user := entity.User{}
 
 	err := r.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT * FROM "users" WHERE "email" = $1`,
 		email,
 	).Scan(

@@ -9,7 +9,7 @@ import (
 )
 
 // Update обновляет информацию о пользователе.
-func (r *Repository) Update(id string, email string, passwordHash string) (*entity.User, error) {
+func (r *Repository) Update(ctx context.Context, id string, email string, passwordHash string) (*entity.User, error) {
 	uuid, err := common.UUIDFromString(id)
 
 	if err != nil {
@@ -17,7 +17,7 @@ func (r *Repository) Update(id string, email string, passwordHash string) (*enti
 	}
 
 	_, err = r.db.Exec(
-		context.Background(),
+		ctx,
 		`UPDATE "users" SET "email" = $2, "password_hash" = $3 WHERE "id" = $1`,
 		uuid,
 		email,

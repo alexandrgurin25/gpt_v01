@@ -3,6 +3,7 @@ package login_service
 import (
 	"app/internal/common"
 	"app/internal/repository/user_repository"
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -25,9 +26,9 @@ func New(repo *user_repository.Repository) *Service {
 	return &Service{repo: repo, secretKey: []byte(secretKey)}
 }
 
-func (s *Service) Login(loginDto LoginDto) (*AuthDto, error) {
+func (s *Service) Login(ctx context.Context, loginDto LoginDto) (*AuthDto, error) {
 	// Находим пользователя по электронной почте
-	user, err := s.repo.FindByEmail(loginDto.Email)
+	user, err := s.repo.FindByEmail(ctx, loginDto.Email)
 
 	if err != nil {
 		return nil, fmt.Errorf("incorrect email or password")

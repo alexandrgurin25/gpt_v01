@@ -11,11 +11,11 @@ import (
 )
 
 // Create создает нового пользователя.
-func (r *Repository) Create(email string, passwordHash string) (*entity.User, error) {
+func (r *Repository) Create(ctx context.Context, email string, passwordHash string) (*entity.User, error) {
 	var id pgtype.UUID
 
 	err := r.db.QueryRow(
-		context.Background(),
+		ctx,
 		`INSERT INTO "users" (email, password_hash) VALUES ($1, $2) RETURNING "id"`,
 		email,
 		passwordHash,

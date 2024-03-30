@@ -2,6 +2,7 @@ package add_user_handler
 
 import (
 	"app/internal/service/telegram_user_service"
+	"context"
 	"fmt"
 	"log"
 
@@ -17,8 +18,8 @@ func New(service *telegram_user_service.Service) *handler {
 }
 
 func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
-
-	_, err := h.service.CreateUserIdByChatId(update.Message.Chat.ID)
+	ctx := context.Background()
+	_, err := h.service.CreateUserIdByChatId(ctx, update.Message.Chat.ID)
 
 	if err != nil {
 		log.Println("add_user_handler.Handle couldn't CreateUserIdByChatId->", err)

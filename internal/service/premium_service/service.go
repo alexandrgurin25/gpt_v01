@@ -2,6 +2,7 @@ package premium_service
 
 import (
 	"app/internal/repository/premium_repository"
+	"context"
 	"fmt"
 	"time"
 )
@@ -14,9 +15,9 @@ func New(repo *premium_repository.Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) CheckPremium(userId string) (bool, error) {
+func (s *Service) CheckPremium(ctx context.Context, userId string) (bool, error) {
 
-	user, err := s.repo.GetByUserID(userId)
+	user, err := s.repo.GetByUserID(ctx, userId)
 
 	if err != nil {
 		return false, fmt.Errorf("question_service checkPremium error: %w", err)

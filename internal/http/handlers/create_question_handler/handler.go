@@ -19,7 +19,8 @@ func New(service *question_service.Service) *handler {
 }
 
 func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
-	userId, ok := r.Context().Value("userId").(string)
+	ctx := r.Context()
+	userId, ok := ctx.Value("userId").(string)
 
 	if !ok {
 		http.Error(w, "", http.StatusUnauthorized)
@@ -34,7 +35,7 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.service.Create(userId, in.Text)
+	result, err := h.service.Create(ctx, userId, in.Text)
 
 	if err != nil {
 		fmt.Println(err)

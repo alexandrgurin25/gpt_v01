@@ -18,14 +18,15 @@ func New(service *question_service.Service) *handler {
 }
 
 func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
-	userId, ok := r.Context().Value("userId").(string) // получение userId из контекста запроса
+	ctx := r.Context()
+	userId, ok := ctx.Value("userId").(string) // получение userId из контекста запроса
 
 	if !ok {
 		http.Error(w, "", http.StatusUnauthorized)
 		return
 	}
 
-	count, err := h.service.AvailableCount(userId)
+	count, err := h.service.AvailableCount(ctx, userId)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

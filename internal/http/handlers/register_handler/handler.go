@@ -18,6 +18,8 @@ func New(service *register_service.Service) *handler {
 }
 
 func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	var in RegisterDtoIn
 	err := json.NewDecoder(r.Body).Decode(&in)
 
@@ -26,7 +28,7 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.service.Register(register_service.RegisterDto(in))
+	_, err = h.service.Register(ctx, register_service.RegisterDto(in))
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

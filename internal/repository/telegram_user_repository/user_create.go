@@ -9,12 +9,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func (r *Repository) CreateUserId(chatID int64) (*entity.TelegramUser, error) {
+func (r *Repository) CreateUserId(ctx context.Context, chatID int64) (*entity.TelegramUser, error) {
 
 	userId := uuid.New()
 
 	rows, err := r.db.Query(
-		context.Background(),
+		ctx,
 		`INSERT INTO "telegram_users" (user_id, chat_id) VALUES ($1, $2)`,
 		userId,
 		chatID,
