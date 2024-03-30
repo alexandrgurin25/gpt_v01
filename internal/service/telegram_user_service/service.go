@@ -23,7 +23,7 @@ func (s *Service) CreateUserIdByChatId(chatId int64) (*entity.TelegramUser, erro
 		return nil, fmt.Errorf("could not check telegram user in db %w", err)
 	}
 
-	if user.UserId == "00000000-0000-0000-0000-000000000000" {
+	if user == nil {
 		user, err = s.repo.CreateUserId(chatId)
 	}
 

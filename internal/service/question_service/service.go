@@ -18,11 +18,11 @@ type AnswerClient interface {
 type Service struct {
 	repo         *question_repository.Repository
 	answerClient AnswerClient
-	repoPrem	*premium_service.Service
+	premiumService	*premium_service.Service
 }
 
-func New(repo *question_repository.Repository, answerClient AnswerClient, repoPrem *premium_service.Service) *Service {
-	return &Service{repo: repo, answerClient: answerClient, repoPrem: repoPrem}
+func New(repo *question_repository.Repository, answerClient AnswerClient, premiumService *premium_service.Service) *Service {
+	return &Service{repo: repo, answerClient: answerClient, premiumService: premiumService}
 }
 
 func (s *Service) Create(userId string, text string) (*entity.Answer, error) {
@@ -68,7 +68,7 @@ func (s *Service) checkLimit(userId string) error {
 		return fmt.Errorf("question_service checkLimit error: %w", err)
 	}
 
-	checkPremium, err := s.repoPrem.CheckPremium(userId)
+	checkPremium, err := s.premiumService.CheckPremium(userId)
 
 	if err != nil {
 		return err
@@ -88,3 +88,4 @@ func (s *Service) checkLimit(userId string) error {
 
 	return nil
 }
+

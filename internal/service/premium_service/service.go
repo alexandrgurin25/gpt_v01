@@ -19,12 +19,12 @@ func (s *Service) CheckPremium(userId string) (bool, error) {
 	user, err := s.repo.GetByUserID(userId)
 
 	if err != nil {
-		return false, fmt.Errorf("question_service checkPremium error:%w", err)
+		return false, fmt.Errorf("question_service checkPremium error: %w", err)
 	}
 
-	tmpTime := time.Now()
+	currentTime := time.Now()
 
-	if user.ActiveTime.Sub(tmpTime) > 0 {
+	if user != nil && user.ActiveTime.Sub(currentTime) > 0 {
 		return true, nil
 	}
 
