@@ -23,6 +23,7 @@ import (
 	"app/internal/repository/telegram_user_repository"
 	"app/internal/repository/user_repository"
 	"app/internal/service/login_service"
+	"app/internal/service/premium_service"
 	"app/internal/service/question_service"
 	"app/internal/service/register_service"
 	"app/internal/service/telegram_user_service"
@@ -63,10 +64,13 @@ func (a *app) Start() {
 	*/
 	//gptchat := openai.New()
 
+
+	premiumService := premium_service.New(premiumRepository)
 	registerService := register_service.New(userRepository)
 	loginService := login_service.New(userRepository)
-	questionService := question_service.New(questionRepository, gigachat, premiumRepository)
+	questionService := question_service.New(questionRepository, gigachat, premiumService)
 	telegramUserService := telegram_user_service.New(telegramUserRepository)
+
 
 	telegramAddHandler := add_user_handler.New(telegramUserService)
 	telegramHandler := create_question_telegram_handler.New(questionService, telegramUserService)

@@ -3,11 +3,11 @@ package question_service
 import (
 	"app/internal/common"
 	"app/internal/entity"
+	"app/internal/service/premium_service"
 	"fmt"
 	"log"
 	"time"
 
-	"app/internal/repository/premium_repository"
 	"app/internal/repository/question_repository"
 )
 
@@ -18,17 +18,20 @@ type AnswerClient interface {
 type Service struct {
 	repo         *question_repository.Repository
 	answerClient AnswerClient
-	repoPremium  *premium_repository.Repository
+	repoPrem	*premium_service.Service
 }
 
-func New(repo *question_repository.Repository, answerClient AnswerClient, repoPremium *premium_repository.Repository) *Service {
-	return &Service{repo: repo, answerClient: answerClient, repoPremium: repoPremium}
+func New(repo *question_repository.Repository, answerClient AnswerClient, repoPrem *premium_service.Service) *Service {
+	return &Service{repo: repo, answerClient: answerClient, repoPrem: repoPrem}
 }
 
 func (s *Service) Create(userId string, text string) (*entity.Answer, error) {
 	err := s.checkLimit(userId)
 	if err != nil {
-		return nil, err
+		arrString := make([]string, 2)
+		arrString[0] = "У вас превышен порог запросов за последние 24ч"
+		arrString[1] = "Обратитесь к @alexan_25"
+		return &entity.Answer{Texts: arrString}, nil
 	}
 	_, err = s.repo.Create(userId, text)
 	if err != nil {
@@ -58,23 +61,6 @@ func (s *Service) AvailableCount(userId string) (int, error) {
 	return currentCount, nil
 }
 
-func (s *Service) checkPremium(userId string) (bool, error) {
-
-	timePremium, err := s.repoPremium.HasByUserIDAndActiveTime(userId)
-
-	if err != nil {
-		return false, fmt.Errorf("question_service checkPremium error:%w", err)
-	}
-
-	tmpTime := time.Now()
-
-	if timePremium.Sub(tmpTime) > 0 {
-		return true, nil
-	}
-
-	return false, nil
-}
-
 func (s *Service) checkLimit(userId string) error {
 	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(userId, time.Now().AddDate(0, 0, -1))
 
@@ -82,7 +68,7 @@ func (s *Service) checkLimit(userId string) error {
 		return fmt.Errorf("question_service checkLimit error: %w", err)
 	}
 
-	checkPremium, err := s.checkPremium(userId)
+	checkPremium, err := s.repoPrem.CheckPremium(userId)
 
 	if err != nil {
 		return err
