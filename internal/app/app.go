@@ -64,13 +64,11 @@ func (a *app) Start() {
 	*/
 	//gptchat := openai.New()
 
-
 	premiumService := premium_service.New(premiumRepository)
 	registerService := register_service.New(userRepository)
 	loginService := login_service.New(userRepository)
 	questionService := question_service.New(questionRepository, gigachat, premiumService)
 	telegramUserService := telegram_user_service.New(telegramUserRepository)
-
 
 	telegramAddHandler := add_user_handler.New(telegramUserService)
 	telegramHandler := create_question_telegram_handler.New(questionService, telegramUserService)
