@@ -3,10 +3,11 @@ package telegram_user_repository
 import (
 	"app/internal/entity"
 	"context"
+	"errors"
 	"fmt"
-	"log"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx"
 )
 
 func (r *Repository) GetUserId(chatID int64) (*entity.TelegramUser, error) {
@@ -15,13 +16,15 @@ func (r *Repository) GetUserId(chatID int64) (*entity.TelegramUser, error) {
 
 	err := r.db.QueryRow(
 		context.Background(),
-		`SELECT (SELECT user_id FROM "telegram_users" WHERE "chat_id" = $1) AS id`,
+		`SELECT user_id FROM "telegram_users" WHERE "chat_id" = $1`,
 		chatID,
 	).Scan(&userId)
 
 	if err != nil {
-		log.Printf("%v", err)
-		return nil, fmt.Errorf("repository GetUserId error %w", err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("repository GetUserId error: %w", err)
 	}
 
 	result := &entity.TelegramUser{

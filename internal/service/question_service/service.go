@@ -3,6 +3,8 @@ package question_service
 import (
 	"app/internal/common"
 	"app/internal/entity"
+	"app/internal/service/premium_service"
+	"fmt"
 	"log"
 	"time"
 
@@ -16,16 +18,20 @@ type AnswerClient interface {
 type Service struct {
 	repo         *question_repository.Repository
 	answerClient AnswerClient
+	premiumService	*premium_service.Service
 }
 
-func New(repo *question_repository.Repository, answerClient AnswerClient) *Service {
-	return &Service{repo: repo, answerClient: answerClient}
+func New(repo *question_repository.Repository, answerClient AnswerClient, premiumService *premium_service.Service) *Service {
+	return &Service{repo: repo, answerClient: answerClient, premiumService: premiumService}
 }
 
 func (s *Service) Create(userId string, text string) (*entity.Answer, error) {
 	err := s.checkLimit(userId)
 	if err != nil {
-		return nil, err
+		arrString := make([]string, 2)
+		arrString[0] = "У вас превышен порог запросов за последние 24ч"
+		arrString[1] = "Обратитесь к @alexan_25"
+		return &entity.Answer{Texts: arrString}, nil
 	}
 	_, err = s.repo.Create(userId, text)
 	if err != nil {
@@ -59,13 +65,27 @@ func (s *Service) checkLimit(userId string) error {
 	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(userId, time.Now().AddDate(0, 0, -1))
 
 	if err != nil {
+		return fmt.Errorf("question_service checkLimit error: %w", err)
+	}
+
+	checkPremium, err := s.premiumService.CheckPremium(userId)
+
+	if err != nil {
 		return err
 	}
-	
-	if countQuestions >= common.MaxQuestionCount {
-		log.Printf("У пользователя %s превышен порог запросов: %d > %d", userId, countQuestions, common.MaxQuestionCount)
-		return common.InternalError
+
+	if checkPremium {
+		if countQuestions >= common.MaxQuestionCountPremium {
+			log.Printf("У пользователя %s c ПРЕМИУМ доступом превышен порог запросов: %d > %d", userId, countQuestions, common.MaxQuestionCount)
+			return common.InternalError
+		}
+	} else {
+		if countQuestions >= common.MaxQuestionCount {
+			log.Printf("У пользователя %s превышен порог запросов: %d > %d", userId, countQuestions, common.MaxQuestionCount)
+			return common.InternalError
+		}
 	}
 
 	return nil
 }
+

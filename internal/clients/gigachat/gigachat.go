@@ -137,8 +137,12 @@ func (client *Client) Request(text string) ([]string, error) {
 		token, _ = client.RequestAuth()
 	}
 	body := body{
-		Model: "GigaChat:latest",
+		Model: "GigaChat",
 		Messages: []messageGC{
+			{
+				Role:    "system",
+				Content: "Не используй в своем ответе формат json, только если user тебя попросит",
+			},
 			{
 				Role:    "user",
 				Content: text,
@@ -148,7 +152,7 @@ func (client *Client) Request(text string) ([]string, error) {
 		TopT:              0.1,
 		N:                 1,
 		Stream:            false,
-		MaxTokens:         512,
+		MaxTokens:         1024,
 		RepetitionPenalty: 1,
 	}
 	bytesRepresentation, err := json.Marshal(body)
