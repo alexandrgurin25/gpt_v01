@@ -3,6 +3,7 @@ package create_question_telegram_handler
 import (
 	"app/internal/service/question_service"
 	"app/internal/service/telegram_user_service"
+	"context"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -18,19 +19,19 @@ func New(qService *question_service.Service, tService *telegram_user_service.Ser
 }
 
 func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
-
+	ctx := context.Background()
 	if update.Message == nil {
 		return
 	}
 
-	user, err := h.telegramService.CreateUserIdByChatId(update.Message.Chat.ID)
-	
+	user, err := h.telegramService.CreateUserIdByChatId(ctx, update.Message.Chat.ID)
+
 	if err != nil {
 		log.Println("", err)
 		return
 	}
 
-	answer, err := h.questionService.Create(user.UserId, update.Message.Text)
+	answer, err := h.questionService.Create(ctx, user.UserId, update.Message.Text)
 
 	if err != nil {
 		log.Println("", err)
@@ -50,4 +51,3 @@ func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 	}
 
 }
-	

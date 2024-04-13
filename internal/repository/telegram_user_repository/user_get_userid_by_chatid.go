@@ -10,12 +10,12 @@ import (
 	"github.com/jackc/pgx"
 )
 
-func (r *Repository) GetUserId(chatID int64) (*entity.TelegramUser, error) {
+func (r *Repository) GetUserId(ctx context.Context, chatID int64) (*entity.TelegramUser, error) {
 
 	var userId uuid.UUID
 
 	err := r.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT user_id FROM "telegram_users" WHERE "chat_id" = $1`,
 		chatID,
 	).Scan(&userId)

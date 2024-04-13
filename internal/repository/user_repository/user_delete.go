@@ -8,9 +8,9 @@ import (
 )
 
 // Delete удаляет пользователя по идентификатору.
-func (r *Repository) Delete(id *pgtype.UUID) error {
+func (r *Repository) Delete(ctx context.Context, id *pgtype.UUID) error {
 	_, err := r.db.Exec(
-		context.Background(),
+		ctx,
 		`DELETE FROM "users" WHERE "id" = $1`,
 		*id,
 	)

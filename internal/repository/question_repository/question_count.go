@@ -6,10 +6,10 @@ import (
 	"log"
 )
 
-func (r *Repository) Count() (int, error) {
+func (r *Repository) Count(ctx context.Context) (int, error) {
 	var count int
 	err := r.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT COUNT(*) FROM "questions"`,
 	).Scan(&count)
 

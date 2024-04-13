@@ -9,7 +9,7 @@ import (
 )
 
 // FindById возвращает пользователя по идентификатору.
-func (r *Repository) FindById(id string) (*entity.User, error) {
+func (r *Repository) FindById(ctx context.Context, id string) (*entity.User, error) {
 	uuid, err := common.UUIDFromString(id)
 
 	if err != nil {
@@ -19,7 +19,7 @@ func (r *Repository) FindById(id string) (*entity.User, error) {
 	user := entity.User{}
 
 	err = r.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT * FROM "users" WHERE "id" = $1`,
 		uuid,
 	).Scan(

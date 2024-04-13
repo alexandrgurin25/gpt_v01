@@ -18,6 +18,8 @@ func New(loginService *login_service.Service) *handler {
 }
 
 func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	var in LoginDtoIn
 	err := json.NewDecoder(r.Body).Decode(&in)
 
@@ -26,7 +28,7 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authDto, err := h.service.Login(login_service.LoginDto(in))
+	authDto, err := h.service.Login(ctx, login_service.LoginDto(in))
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

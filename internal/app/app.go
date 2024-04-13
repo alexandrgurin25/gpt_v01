@@ -43,7 +43,7 @@ func (a *app) Start() {
 		log.Print("No .env file found")
 	}
 
-	dataBase, err := database.New()
+	dataBase, err := database.New(database.WithConn())
 
 	if err != nil {
 		fmt.Println(err)

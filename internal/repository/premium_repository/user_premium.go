@@ -10,12 +10,12 @@ import (
 	"github.com/jackc/pgx"
 )
 
-func (r *Repository) GetByUserID(userId string) (*entity.Premium, error) {
+func (r *Repository) GetByUserID(ctx context.Context, userId string) (*entity.Premium, error) {
 
 	var timeActive time.Time
 
 	err := r.db.QueryRow(
-		context.Background(),
+		ctx,
 		`SELECT "active_time" FROM "premium" WHERE "user_id" = $1`,
 		userId,
 	).Scan(&timeActive)

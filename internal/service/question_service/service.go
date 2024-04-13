@@ -4,6 +4,7 @@ import (
 	"app/internal/common"
 	"app/internal/entity"
 	"app/internal/service/premium_service"
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -16,24 +17,24 @@ type AnswerClient interface {
 }
 
 type Service struct {
-	repo         *question_repository.Repository
-	answerClient AnswerClient
-	premiumService	*premium_service.Service
+	repo           *question_repository.Repository
+	answerClient   AnswerClient
+	premiumService *premium_service.Service
 }
 
 func New(repo *question_repository.Repository, answerClient AnswerClient, premiumService *premium_service.Service) *Service {
 	return &Service{repo: repo, answerClient: answerClient, premiumService: premiumService}
 }
 
-func (s *Service) Create(userId string, text string) (*entity.Answer, error) {
-	err := s.checkLimit(userId)
+func (s *Service) Create(ctx context.Context, userId string, text string) (*entity.Answer, error) {
+	err := s.checkLimit(ctx, userId)
 	if err != nil {
 		arrString := make([]string, 2)
 		arrString[0] = "У вас превышен порог запросов за последние 24ч"
 		arrString[1] = "Обратитесь к @alexan_25"
 		return &entity.Answer{Texts: arrString}, nil
 	}
-	_, err = s.repo.Create(userId, text)
+	_, err = s.repo.Create(ctx, userId, text)
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +46,8 @@ func (s *Service) Create(userId string, text string) (*entity.Answer, error) {
 	return &entity.Answer{Texts: answer}, err
 }
 
-func (s *Service) AvailableCount(userId string) (int, error) {
-	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(userId, time.Now().AddDate(0, 0, -1))
+func (s *Service) AvailableCount(ctx context.Context, userId string) (int, error) {
+	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(ctx, userId, time.Now().AddDate(0, 0, -1))
 	var currentCount int
 
 	if err != nil {
@@ -61,14 +62,14 @@ func (s *Service) AvailableCount(userId string) (int, error) {
 	return currentCount, nil
 }
 
-func (s *Service) checkLimit(userId string) error {
-	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(userId, time.Now().AddDate(0, 0, -1))
+func (s *Service) checkLimit(ctx context.Context, userId string) error {
+	countQuestions, err := s.repo.CountQuestionsByUserIdAtToday(ctx, userId, time.Now().AddDate(0, 0, -1))
 
 	if err != nil {
 		return fmt.Errorf("question_service checkLimit error: %w", err)
 	}
 
-	checkPremium, err := s.premiumService.CheckPremium(userId)
+	checkPremium, err := s.premiumService.CheckPremium(ctx, userId)
 
 	if err != nil {
 		return err
@@ -88,4 +89,3 @@ func (s *Service) checkLimit(userId string) error {
 
 	return nil
 }
-
