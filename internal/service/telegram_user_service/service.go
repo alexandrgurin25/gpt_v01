@@ -24,11 +24,7 @@ func (s *Service) CreateUserIdByChatId(ctx context.Context, chatId int64) (*enti
 		return nil, fmt.Errorf("could not check telegram user in db %w", err)
 	}
 
-<<<<<<< HEAD
 	if user == nil {
-=======
-	if user.UserId == "00000000-0000-0000-0000-000000000000" {
->>>>>>> c1bee4d (added integration tests)
 		user, err = s.repo.CreateUserId(ctx, chatId)
 	}
 

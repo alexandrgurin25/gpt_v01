@@ -16,11 +16,7 @@ func (r *Repository) GetUserId(ctx context.Context, chatID int64) (*entity.Teleg
 
 	err := r.db.QueryRow(
 		ctx,
-<<<<<<< HEAD
 		`SELECT user_id FROM "telegram_users" WHERE "chat_id" = $1`,
-=======
-		`SELECT (SELECT user_id FROM "telegram_users" WHERE "chat_id" = $1) AS id`,
->>>>>>> c1bee4d (added integration tests)
 		chatID,
 	).Scan(&userId)
 

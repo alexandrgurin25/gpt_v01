@@ -25,19 +25,17 @@ func Test_Create(t *testing.T) {
 	tx, err := db.Begin(ctx)
 	assert.NoError(t, err)
 
-	// после теста транзакциюд откатываем, чтобы в Бд ничего не сохранилось
+	// после теста транзакцию откатываем, чтобы в Бд ничего не сохранилось
 	defer tx.Rollback(ctx)
 
 	// инициализация репозитория
-	repo := New(db)
+	repo := New(tx)
 
 	// вызов тестируемого метода
 	result, err := repo.Create(ctx, "test@test.ru", "password_hash")
-
-	// проверка отсутствия ошибки
 	assert.NoError(t, err)
 
-	// проверка что резозиторий возвращает корректные данные
+	// проверка что репозиторий возвращает корректные данные
 	assert.Greater(t, len(result.ID), 0)
 	assert.Equal(t, "test@test.ru", result.Email)
 	assert.Equal(t, "password_hash", result.PasswordHash)

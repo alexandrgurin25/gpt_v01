@@ -12,7 +12,7 @@ func (r *Repository) Delete(ctx context.Context, id *pgtype.UUID) error {
 	_, err := r.db.Exec(
 		ctx,
 		`DELETE FROM "users" WHERE "id" = $1`,
-		*id,
+		id,
 	)
 
 	if err != nil {
