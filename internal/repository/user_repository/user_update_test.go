@@ -24,7 +24,9 @@ func Test_Update(t *testing.T) {
 
 	prepareData(ctx, t, tx)
 
-	result, err := repo.Update(ctx, "00000000-0000-0000-0000-000000000001", "test123@email.ru", "pass123")
+	userID := "00000000-0000-0000-0000-000000000001"
+
+	result, err := repo.Update(ctx, userID, "test123@email.ru", "pass123")
 	assert.NoError(t, err)
 
 	// проверка что репозиторий возвращает корректные данные
@@ -33,7 +35,7 @@ func Test_Update(t *testing.T) {
 	assert.Equal(t, "pass123", result.PasswordHash)
 
 	// Создать отдельную "getData" by id
-	dataInDB := getDataById(ctx, t, tx)
+	dataInDB := getDataById(ctx, userID, t, tx)
 
 	// проверка что в базу вставлены корректные данные
 	assert.Equal(t, result.ID, dataInDB.ID)
@@ -41,12 +43,13 @@ func Test_Update(t *testing.T) {
 	assert.Equal(t, "pass123", dataInDB.PasswordHash)
 }
 
-func getDataById(ctx context.Context, t *testing.T, db database.DataBase) *entity.User {
+func getDataById(ctx context.Context, userID string, t *testing.T, db database.DataBase) *entity.User {
 	var user entity.User
 
 	err := db.QueryRow(
 		ctx,
-		`SELECT "id", "email", "password_hash" FROM "users"`,
+		`SELECT "id", "email", "password_hash" FROM "users" WHERE "id" = $1`,
+		userID,
 	).Scan(
 		&user.ID,
 		&user.Email,
