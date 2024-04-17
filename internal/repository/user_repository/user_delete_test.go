@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Тест на удаление данных из таблицы "users"
 func Test_Delete(t *testing.T) {
 	ctx := context.Background()
 

@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Добавление пользователя из telegram в таблицу "telegram_users"
 func (r *Repository) CreateUserId(ctx context.Context, chatID int64) (*entity.TelegramUser, error) {
 
 	userId := uuid.New()

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// тест на получение всех данных
+// Тест на получение всех данных
 func Test_Create(t *testing.T) {
 	ctx := context.Background()
 

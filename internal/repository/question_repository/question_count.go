@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+// Подсчет количества всех вопросов от пользователей
 func (r *Repository) Count(ctx context.Context) (int, error) {
 	var count int
 	err := r.db.QueryRow(

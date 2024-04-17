@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// Добавление в таблицу "questions" вопроса от пользователя
 func (r *Repository) Create(ctx context.Context, userId string, text string) (*entity.Question, error) {
 	var id int64
 	var createdAt time.Time
