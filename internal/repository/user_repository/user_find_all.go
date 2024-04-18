@@ -19,6 +19,7 @@ func (r *Repository) FindAll(ctx context.Context) ([]entity.User, error) {
 
 	if err != nil {
 		log.Printf("%v", err)
+		rows.Close()
 		return nil, fmt.Errorf("repository user find all error %w", err)
 	}
 
