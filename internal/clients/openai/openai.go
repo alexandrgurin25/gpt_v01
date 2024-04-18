@@ -91,7 +91,7 @@ func (client *Client) Request(text string) ([]string, error) {
 	c := &http.Client{}
 	response, err := c.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("сould not get a response: %w", err)
+		return nil, fmt.Errorf("could not get a response: %w", err)
 	}
 
 	defer response.Body.Close()

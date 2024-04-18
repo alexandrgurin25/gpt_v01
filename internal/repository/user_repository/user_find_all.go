@@ -16,14 +16,15 @@ func (r *Repository) FindAll(ctx context.Context) ([]entity.User, error) {
 		ctx,
 		`SELECT * FROM "users"`,
 	)
-	defer rows.Close()
 
 	if err != nil {
 		log.Printf("%v", err)
 		return nil, fmt.Errorf("repository user find all error %w", err)
 	}
 
-	users := make([]entity.User, 0, 0)
+	defer rows.Close()
+
+	users := make([]entity.User, 0)
 
 	for rows.Next() {
 		user := entity.User{}
