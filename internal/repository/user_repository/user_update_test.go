@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//Test_Update проверяет функцию Update, обновление данных у пользователей
 func Test_Update(t *testing.T) {
 	ctx := context.Background()
 

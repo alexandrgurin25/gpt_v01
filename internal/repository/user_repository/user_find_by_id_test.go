@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Test_FindById тест на получение данных по Email
-func Test_FindByEmail(t *testing.T) {
+// Test_FindById тест на получение данных по id
+func Test_FindById(t *testing.T) {
 	ctx := context.Background()
 
 	db, err := database.New(database.WithTestConn())
-
 	assert.NoError(t, err)
+
 	defer db.Close(ctx)
 
 	tx, err := db.Begin(ctx)
@@ -27,7 +27,7 @@ func Test_FindByEmail(t *testing.T) {
 
 	repo := New(tx)
 
-	result, err := repo.FindByEmail(ctx, "test1@test.ru")
+	result, err := repo.FindById(ctx, "00000000-0000-0000-0000-000000000001")
 
 	expected := &entity.User{
 		ID:           "00000000-0000-0000-0000-000000000001",

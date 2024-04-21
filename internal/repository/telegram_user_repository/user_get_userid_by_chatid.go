@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx"
 )
 
-// Получение для пользователя UUID по chat_id из telegram 
+// GetUserId получение для пользователя UUID по chat_id из telegram 
 func (r *Repository) GetUserId(ctx context.Context, chatID int64) (*entity.TelegramUser, error) {
 
 	var userId uuid.UUID
