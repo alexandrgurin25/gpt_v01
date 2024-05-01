@@ -11,15 +11,14 @@ import (
 
 // Добавление в таблицу "questions" вопроса от пользователя
 func (r *Repository) Create(ctx context.Context, userId string, text string) (*entity.Question, error) {
-	var id int64
 	var createdAt time.Time
 
 	err := r.db.QueryRow(
 		ctx,
-		`INSERT INTO "questions" ("user_id", "text") VALUES ($1, $2) RETURNING "id", "created_at"`,
+		`INSERT INTO "questions" ("user_id", "text") VALUES ($1, $2) RETURNING "created_at"`,
 		userId,
 		text,
-	).Scan(&id, &createdAt)
+	).Scan(&createdAt)
 
 	if err != nil {
 		log.Printf("%v", err)
