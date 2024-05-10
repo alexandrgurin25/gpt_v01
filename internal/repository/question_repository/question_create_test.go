@@ -29,7 +29,10 @@ func Test_Create(t *testing.T) {
 	questionCreate, err := repo.Create(ctx, "00000000-0000-0000-0000-000000000001", "Привет! Что ты умеешь?")
 	assert.NoError(t, err)
 
-	assert.Equal(t, questionCreate.UserId, questionCreateTest.UserId)
+	assert.Equal(t, questionCreate.UserId, "00000000-0000-0000-0000-000000000001")
+	assert.Equal(t, questionCreateTest.UserId,"00000000-0000-0000-0000-000000000001")
+	assert.Equal(t, "Привет! Что ты умеешь?", questionCreate.Text)
+	assert.Equal(t, "Привет! Что ты умеешь?", questionCreateTest.Text)
 	assert.Equal(t, questionCreate.Text, questionCreate.Text)
 }
 

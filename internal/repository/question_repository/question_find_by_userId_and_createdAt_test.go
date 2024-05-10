@@ -23,26 +23,10 @@ func  Test_CountQuestionsByUserIDAtToday(t *testing.T) {
 
 	repo := New(tx)
 
-	countQueryTest := CountQuestionsByUserIDAtTodayQuery(t, tx, ctx)
 	countQuery, err := repo.CountQuestionsByUserIdAtToday(ctx, "00000000-0000-0000-0000-000000000001", time.Now().AddDate(0, 0, -1))
 	assert.NoError(t, err)
 
-	assert.Equal(t, countQuery, countQueryTest)
-}
-
-func CountQuestionsByUserIDAtTodayQuery(t *testing.T, db database.DataBase, ctx context.Context) int {
-	timeNow := time.Now()
-	var countQuery int
-
-	err := db.QueryRow(
-		ctx,
-		"SELECT COUNT(*) FROM questions WHERE user_id = $1 and created_at > $2",
-		"00000000-0000-0000-0000-000000000001",
-		timeNow.AddDate(0, 0, -1),
-	).Scan(&countQuery)
-
-	assert.NoError(t, err)
-	return countQuery
+	assert.Equal(t, countQuery, 1)
 }
 
 func prepareDataForTestCountQuestionsByUserID(t *testing.T, db database.DataBase, ctx context.Context) {

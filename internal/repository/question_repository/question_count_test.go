@@ -25,24 +25,11 @@ func Test_Count(t *testing.T) {
 
 	prepareData(t, ctx, db)
 
-	countQueryTest := count(t, ctx, tx)
 	countQuery, err := repo.Count(ctx)
 	assert.NoError(t, err)
 
-	assert.Equal(t, countQuery, countQueryTest)
+	assert.Equal(t, countQuery, 3)
 
-}
-
-func count(t *testing.T, ctx context.Context, db database.DataBase) int {
-	var countQuery int
-
-	err := db.QueryRow(
-		ctx,
-		`SELECT COUNT(*) FROM "questions"`,
-	).Scan(&countQuery)
-	assert.NoError(t, err)
-
-	return countQuery
 }
 
 /*

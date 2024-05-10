@@ -1,13 +1,10 @@
 package telegram_user_repository
 
 import (
-	"app/internal/common"
 	"app/internal/database"
-	"app/internal/entity"
 	"context"
 	"testing"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,12 +22,11 @@ func Test_GetUserId(t *testing.T) {
 	prepareDataForTelegram(t, ctx, tx)
 	repo := New(tx)
 
-	testUserTelegram := getUserIdForTest(t, ctx, tx, 25022004)
-
 	userTelegram, err := repo.GetUserId(ctx, 25022004)
 	assert.NoError(t, err)
 
-	assert.Equal(t, testUserTelegram, userTelegram)
+	assert.Equal(t, int64(25022004), userTelegram.ChatId)
+	assert.Equal(t, userTelegram.UserId, "00000000-0000-0000-0000-000000000001")
 }
 
 func prepareDataForTelegram(t *testing.T, ctx context.Context, db database.DataBase) {
@@ -41,23 +37,4 @@ func prepareDataForTelegram(t *testing.T, ctx context.Context, db database.DataB
 		25022004,
 	)
 	assert.NoError(t, err)
-}
-
-func getUserIdForTest(t *testing.T, ctx context.Context, db database.DataBase, chatID int64) *entity.TelegramUser {
-	var userID *pgtype.UUID
-
-	err := db.QueryRow(
-		ctx,
-		`SELECT user_id FROM telegram_users WHERE chat_id = $1`,
-		chatID,
-	).Scan(&userID)
-
-	assert.NoError(t, err)
-
-	result := entity.TelegramUser{
-		UserId: common.StringFromUUID(userID),
-		ChatId: chatID,
-	}
-
-	return &result
 }
