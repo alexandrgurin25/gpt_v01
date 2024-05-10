@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Подсчет количества количества вопросов от пользователя за n-e время
 func (r *Repository) CountQuestionsByUserIdAtToday(ctx context.Context, userId string, createdAt time.Time) (int, error) {
 	var countQuery int
 

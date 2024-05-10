@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-// Create создает нового пользователя.
+// Создает нового пользователя в таблице "users"
 func (r *Repository) Create(ctx context.Context, email string, passwordHash string) (*entity.User, error) {
 	var id pgtype.UUID
 
