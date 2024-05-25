@@ -31,7 +31,7 @@ func (h *handler) Handle(update tgbotapi.Update, bot *tgbotapi.BotAPI) {
 		return
 	}
 
-	answer, err := h.questionService.Create(ctx, user.UserId, update.Message.Text)
+	answer, err := h.questionService.CreateQuestion(ctx, user.UserId, update.Message.Text)
 
 	if err != nil {
 		log.Println("", err)
