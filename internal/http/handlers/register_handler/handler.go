@@ -28,7 +28,7 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.service.Register(ctx, register_service.RegisterDto(in))
+	_, err = h.service.Register(ctx, in.Email, in.Password)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
