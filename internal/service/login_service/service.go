@@ -2,7 +2,7 @@ package login_service
 
 import (
 	"app/internal/common"
-	"app/internal/repository/user_repository"
+	"app/internal/entity"
 	"context"
 	"fmt"
 	"log"
@@ -13,11 +13,17 @@ import (
 )
 
 type Service struct {
-	repo      *user_repository.Repository
+	repo      Repository
 	secretKey []byte
 }
 
-func New(repo *user_repository.Repository) *Service {
+type Repository interface {
+	FindByEmail(ctx context.Context, email string) (*entity.User, error)
+}
+
+//go:generate mockgen -destination=mocks/service.go -package=mocks -source=service.go
+
+func New(repo Repository) *Service {
 	secretKey, exists := os.LookupEnv("AUTH_SECRET_KEY")
 	if !exists {
 		log.Fatal("AUTH_SECRET_KEY not founded")
@@ -35,7 +41,7 @@ func (s *Service) Login(ctx context.Context, loginDto LoginDto) (*AuthDto, error
 	}
 
 	// Проверяем совпадение паролей
-	if !common.CheckPasswordHash(loginDto.Password, user.PasswordHash) {
+	if !common.CheckPasswordHash(loginDto.Password, user.PasswordHash) {	
 		return nil, fmt.Errorf("incorrect email or password")
 	}
 

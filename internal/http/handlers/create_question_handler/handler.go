@@ -35,7 +35,7 @@ func (h *handler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.service.Create(ctx, userId, in.Text)
+	result, err := h.service.CreateQuestion(ctx, userId, in.Text)
 
 	if err != nil {
 		fmt.Println(err)
