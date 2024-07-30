@@ -25,7 +25,9 @@ func Test_Login(t *testing.T) {
 
 	// описываем поведение мока на момент теста
 
-	password, _ := common.HashPassword("passwordHash1")
+	password, err := common.HashPassword("passwordHash1")
+	assert.NoError(t, err)
+
 	repoMock.
 		EXPECT().
 		FindByEmail(gomock.Any(), gomock.Any()).
@@ -37,7 +39,7 @@ func Test_Login(t *testing.T) {
 
 	service := New(repoMock)
 
-	login := (LoginDto{Email: "test1@test.ru", Password: "passwordHash1"})
+	login := LoginDto{Email: "test1@test.ru", Password: "passwordHash1"}
 
 	user, err := service.Login(ctx, login)
 
